@@ -49,66 +49,71 @@ def test_login_success(page, test_config):
         f"(Đăng nhập không thành công: không tìm thấy tên hoặc nút Đăng xuất)"
 
 
-def test_login_fail_wrong_password(page, test_config):
-    """TC-02: Login fail – wrong password (*Đăng nhập thất bại – sai mật khẩu*)
+def test_login_fail_wrong_password(page, test_config): #Điệp#
+    """TC-02: Login fail – wrong password"""
 
-    🔴 NOT COMPLETED — Students must implement this test case.
-    (*CHƯA HOÀN THÀNH — Sinh viên cần viết code cho test case này.*)
+    # [R] Reachability: Truy cập trang đăng nhập
+    page.goto(test_config["base_url"], wait_until="networkidle", timeout=60000)
+    enable_flutter_semantics(page)
 
-    Description (*Mô tả*):
-        Enter correct email but wrong password → system stays on login page
-        or shows an error message.
-        (*Nhập email đúng nhưng mật khẩu sai → hệ thống không chuyển trang,
-        hoặc hiển thị thông báo lỗi.*)
+    # [I] Infection: Nhập email đúng, mật khẩu sai
+    flutter_fill(page, "Email", test_config["email"])
+    flutter_fill(page, "Mật khẩu", "wrongpassword")
+    flutter_click_button(page, "Đăng nhập")
 
-    📖 RIPR — Áp dụng cho test case này:
-        [R] page.goto(...) → Chạm tới trang đăng nhập
-        [I] flutter_fill(..., "wrongpassword") → Nhiễm trạng thái lỗi
-        [P] Hệ thống xử lý login → Lỗi lan truyền ra thông báo
-        [R✓] assert ... → Test Oracle kiểm tra thông báo lỗi
+    # [P] Propagation: Lỗi lan truyền ra giao diện
+    wait_for_flutter(page, text="Mật khẩu không đúng")
 
-    💡 Bonus B2 — Data-Driven Testing:
-        TC-02 và TC-03 có cùng pattern (nhập → click → kiểm tra lỗi).
-        Bạn có thể gộp bằng @pytest.mark.parametrize:
+    # Chụp ảnh minh chứng
+    page.screenshot(
+        path=os.path.join(
+            SCREENSHOT_DIR,
+            "login_fail_wrong_password.png"
+        )
+    )
 
-        @pytest.mark.parametrize("email, password, tc_id", [
-            ("valid@email.com", "wrongpass", "TC-02"),
-            ("", "", "TC-03"),
-        ])
-        def test_login_fail(page, test_config, email, password, tc_id):
-            ...
+   # [R✓] Revealability
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
 
-        Xem thêm: docs/textbook-concepts.md §3 (Data-Driven Testing)
+    has_error = "Mật khẩu không đúng" in sem_text
+    has_user_name = test_config["display_name"] in sem_text
+    has_logout = "Đăng xuất" in sem_text or "Logout" in sem_text
 
-    Suggested steps (*Gợi ý các bước*):
-        1. Navigate to login page (*Truy cập trang đăng nhập*)
-        2. Enable Flutter semantics (*Bật Flutter semantics*)
-        3. Enter correct Email (from test_config["email"]) (*Nhập Email đúng*)
-        4. Enter wrong Password (e.g. "wrongpassword") (*Nhập Mật khẩu sai*)
-        5. Click "Đăng nhập" (*Click "Đăng nhập"*)
-        6. Assert: URL still on login page OR error message shown
-           (*Assert: URL vẫn ở trang đăng nhập HOẶC có thông báo lỗi*)
-    """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    assert has_error, \
+     "Expected error message 'Mật khẩu không đúng' was not displayed"
 
+    assert not (has_user_name or has_logout), \
+     "Login unexpectedly succeeded with wrong password"
+def test_login_fail_empty_fields(page, test_config): #Điệp03#
+    """TC-03: Login fail – empty fields (*Đăng nhập thất bại – để trống các trường*)"""
 
-def test_login_fail_empty_fields(page, test_config):
-    """TC-03: Login fail – empty fields (*Đăng nhập thất bại – để trống các trường*)
+    # [R] Reachability: Truy cập trang đăng nhập
+    page.goto(test_config["base_url"], wait_until="networkidle", timeout=60000)
+    enable_flutter_semantics(page)
 
-    🔴 NOT COMPLETED — Students must implement this test case.
-    (*CHƯA HOÀN THÀNH — Sinh viên cần viết code cho test case này.*)
+    # [I] Infection: Không nhập Email/Mật khẩu
+    flutter_click_button(page, "Đăng nhập")
 
-    Description (*Mô tả*):
-        Leave all fields empty, click Login → system stays on login page.
-        (*Không nhập gì, bấm Đăng nhập → hệ thống không chuyển trang.*)
+    # [P] Propagation: Chờ thông báo lỗi xuất hiện
+    wait_for_flutter(page, text="Vui lòng nhập email và mật khẩu")
 
-    Suggested steps (*Gợi ý các bước*):
-        1. Navigate to login page (*Truy cập trang đăng nhập*)
-        2. Enable Flutter semantics (*Bật Flutter semantics*)
-        3. Do NOT enter Email/Password — click "Đăng nhập" immediately
-           (*KHÔNG nhập Email/Mật khẩu — click "Đăng nhập" ngay*)
-        4. Assert: URL still on login page (*Assert: URL vẫn ở trang đăng nhập*)
-    """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    # Chụp ảnh minh chứng
+    page.screenshot(
+        path=os.path.join(
+            SCREENSHOT_DIR,
+            "login_fail_empty_fields.png"
+        )
+    )
+
+    # [R✓] Revealability: Kiểm tra kết quả
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+
+    has_error = "Vui lòng nhập email và mật khẩu" in sem_text
+    has_user_name = test_config["display_name"] in sem_text
+    has_logout = "Đăng xuất" in sem_text or "Logout" in sem_text
+
+    assert has_error, \
+        "Validation message 'Vui lòng nhập email và mật khẩu' was not displayed"
+
+    assert not (has_user_name or has_logout), \
+        "Login unexpectedly succeeded with empty credentials"
