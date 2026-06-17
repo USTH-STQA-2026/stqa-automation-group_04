@@ -26,7 +26,8 @@ Sử dụng **Playwright + Python** để kiểm thử hệ thống Mượn sác
 | 2   |23BA14055      |Nguyễn Phúc Đức           | Thành viên  |
 | 3   |22BI13374      |Nguyễn Minh Quân           | Thành viên  |
 | 4   |      |           | Thành viên  |
-
+### Project Repository
+[Click here to view Group 4 Automation Testing](https://github.com/USTH-STQA-2026/stqa-automation-group_04.git)
 ---
 
 ## 📖 Trước khi bắt đầu — Bối cảnh / Before You Start — Context
