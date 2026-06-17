@@ -55,6 +55,40 @@ def test_search_book_by_name(page, test_config):
     assert flutter_books.count() > 0, \
         "No books containing 'Flutter' were found in search results"
 
+def test_search_book_no_result(page, test_config):
+    """
+    TC-05: Verify search returns no results for a non-existent keyword.
+    """
+
+    # [R] Reachability
+    login(page, test_config)
+    enable_flutter_semantics(page)
+
+    # [I] Infection: nhập từ khóa không tồn tại
+    flutter_fill(
+        page,
+        "Tìm kiếm theo tên sách hoặc tác giả...",
+        "xyz_khong_ton_tai_12345"
+    )
+
+    page.wait_for_timeout(2000)
+
+    # Chụp minh chứng
+    page.screenshot(
+        path=os.path.join(
+            SCREENSHOT_DIR,
+            "search_book_no_result.png"
+        )
+    )
+
+    # [R✓] Revealability
+    books = page.locator(
+        'flt-semantics[role="group"][aria-label*="Mã: BOOK"]'
+    )
+
+    assert books.count() == 0, \
+        "Search returned books for a non-existent keyword"
+
 def test_filter_by_category(page, test_config):
     """TC-06: Filter books by category 'Công nghệ'"""
 

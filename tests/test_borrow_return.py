@@ -86,38 +86,96 @@ def test_borrow_book(page, test_config):
     assert has_borrowed or has_success, \
         "Borrow operation failed"
 def test_view_borrowed_books(page, test_config):
-    """TC-09: View borrowed books list (*Xem danh sách sách đang mượn — tab Mượn / Trả*)
+    """TC-09: View borrowed books list"""
 
-    🔴 NOT COMPLETED (*CHƯA HOÀN THÀNH*)
+    # [R] Reachability
+    login(page, test_config)
+    enable_flutter_semantics(page)
 
-    Description (*Mô tả*):
-        Log in → switch to "Mượn / Trả" tab → verify borrowed books are shown.
-        (*Đăng nhập → chuyển sang tab "Mượn / Trả" → kiểm tra có sách đang mượn.*)
+    page.wait_for_timeout(1000)
 
-    Hints (*Gợi ý*):
-        - Click tab: page.locator('flt-semantics[role="tab"][aria-label="Mượn / Trả"]')
-        - Verify: books with "Đang mượn" in aria-label, or "Trả sách" button exists
-          (*Kiểm tra: có sách với aria-label chứa "Đang mượn" hoặc có nút "Trả sách"*)
-    """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    # Chuyển sang tab Mượn / Trả
+    borrow_tab = page.locator(
+        'flt-semantics[role="tab"][aria-label="Mượn / Trả"]'
+    )
 
+    assert borrow_tab.count() > 0, \
+        "Borrow/Return tab not found"
 
+    borrow_tab.click()
+
+    page.wait_for_timeout(1000)
+    enable_flutter_semantics(page)
+
+    # Chụp minh chứng
+    page.screenshot(
+        path=os.path.join(
+            SCREENSHOT_DIR,
+            "view_borrowed_books.png"
+        )
+    )
+
+    # [R✓] Verify
+    sem_text = " ".join(
+        page.locator("flt-semantics").all_text_contents()
+    )
+
+    has_borrowed = "Đang mượn" in sem_text
+    has_return_button = "Trả sách" in sem_text
+
+    assert has_borrowed or has_return_button, \
+        "No borrowed books displayed"
 def test_return_book(page, test_config):
-    """TC-10: Return a borrowed book (*Trả sách đang mượn*)
+    """TC-10: Return a borrowed book"""
 
-    🔴 NOT COMPLETED (*CHƯA HOÀN THÀNH*)
+    # [R] Reachability
+    login(page, test_config)
+    enable_flutter_semantics(page)
 
-    Description (*Mô tả*):
-        Log in → go to "Mượn / Trả" tab → click "Trả sách" → verify book is returned.
-        (*Đăng nhập → tab "Mượn / Trả" → click "Trả sách" → kiểm tra sách được trả.*)
+    page.wait_for_timeout(1000)
 
-    Hints (*Gợi ý*):
-        - Switch to "Mượn / Trả" tab (*Chuyển tab "Mượn / Trả"*)
-        - Find return button: page.locator('flt-semantics[role="button"]:has-text("Trả sách")')
-          (*Tìm nút "Trả sách"*)
-        - Click and verify status change or success message
-          (*Click và kiểm tra sách chuyển trạng thái hoặc có thông báo thành công*)
-    """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    # Chuyển sang tab Mượn / Trả
+    borrow_tab = page.locator(
+        'flt-semantics[role="tab"][aria-label="Mượn / Trả"]'
+    )
+
+    assert borrow_tab.count() > 0, \
+        "Borrow/Return tab not found"
+
+    borrow_tab.click()
+
+    page.wait_for_timeout(1000)
+    enable_flutter_semantics(page)
+
+    # Tìm nút Trả sách
+    return_buttons = page.locator(
+        'flt-semantics[role="button"]:has-text("Trả sách")'
+    )
+
+    assert return_buttons.count() > 0, \
+        "No return button found"
+
+    # [I] Thực hiện trả sách
+    return_buttons.first.click()
+
+    page.wait_for_timeout(2000)
+    enable_flutter_semantics(page)
+
+    # Chụp minh chứng
+    page.screenshot(
+        path=os.path.join(
+            SCREENSHOT_DIR,
+            "return_book.png"
+        )
+    )
+
+    # [R✓] Verify
+    sem_text = " ".join(
+        page.locator("flt-semantics").all_text_contents()
+    )
+
+    has_returned = "Đã trả" in sem_text
+    has_success = "thành công" in sem_text.lower()
+
+    assert has_returned or has_success, \
+        "Return operation failed"
